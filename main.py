@@ -10,7 +10,7 @@ app.secret_key = "nhatteo2403"
 admin_password = "@nhat24032002"
 
 # Kết nối Upstash Redis
-REDIS_URL = "redis://:AWdXAAIjcDE2YTU2MDYyZGUyOWY0NjQ2YjE4MWQ1OTRiOWQ0ZDYwZnAxMA@related-wildcat-26455.upstash.io:6379"
+REDIS_URL = "rediss://default:AWdXAAIjcDE2YTU2MDYyZGUyOWY0NjQ2YjE4MWQ1OTRiOWQ0ZDYwZnAxMA@related-wildcat-26455.upstash.io:6379"
 r = redis.from_url(REDIS_URL, decode_responses=True)
 
 # Hàm load danh sách nhạc từ Redis
