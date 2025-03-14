@@ -6,7 +6,7 @@ import os
 import redis
 
 # Kết nối Upstash Redis
-REDIS_URL = "redis://:password@your-upstash-url:port"
+REDIS_URL = "redis://:AWdXAAIjcDE2YTU2MDYyZGUyOWY0NjQ2YjE4MWQ1OTRiOWQ0ZDYwZnAxMA@related-wildcat-26455.upstash.io:6379"
 r = redis.from_url(REDIS_URL, decode_responses=True)
 
 # Đọc danh sách nhạc từ Redis
