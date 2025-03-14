@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký nhạc</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            text-align: center;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            color: black;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            width: 80%;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .song-list {
+            list-style: none;
+            padding: 0;
+        }
+        .song-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .thumbnail {
+            width: 80px;
+            height: 60px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        .delete-btn {
+            margin-left: auto;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Đăng ký bài nhạc 🎶</h1>
+
+        <!-- Hiển thị thông tin người dùng & nút Đăng xuất -->
+        {% if session.is_admin %}
+            <p>Xin chào, <strong>Admin</strong>! 👋</p>
+            <p><a href="{{ url_for('logout') }}" style="color: red; font-weight: bold;">Đăng xuất</a></p>
+        {% else %}
+            <p><a href="{{ url_for('login') }}" style="color: white; font-weight: bold;">Đăng nhập</a></p>
+        {% endif %}
+
+
+        <form method="POST">
+            <input type="text" name="link_nhac" placeholder="Dán link YouTube vào đây" required>
+            <button type="submit">Thêm</button>
+        </form>
+
+        <!-- Hiển thị thông báo lỗi nếu có -->
+        {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <ul class="song-list">
+            {% if danh_sach_nhac %}
+            {% for song in danh_sach_nhac %}
+                {% set i = loop.index0 %}
+                <li class="song-item">
+                    <img class="thumbnail" src="{{ song.thumbnail }}" alt="Thumbnail">
+                    <a href="{{ song.link }}" target="_blank">{{ song.title }}</a>
+                    {% if is_admin %}
+                        <form action="{{ url_for('delete', index=i) }}" method="POST" style="display:inline;">
+                            <button class="delete-btn" type="submit">Xóa</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            {% else %}
+                <p>Không có bài hát nào trong danh sách</p>
+            {% endif %}
+        </ul>
+    </div>
+</body>
+
+</html>
