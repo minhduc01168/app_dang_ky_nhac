@@ -3,21 +3,20 @@ import webbrowser
 import time
 import yt_dlp
 import os
+import redis
 
-# Đường dẫn file JSON (chuyển sang đường dẫn tương đối)
-json_file = os.path.join(os.path.dirname(__file__), "music_list.json")
+# Kết nối Upstash Redis
+REDIS_URL = "redis://:password@your-upstash-url:port"
+r = redis.from_url(REDIS_URL, decode_responses=True)
 
-# Đọc dữ liệu từ file JSON
+# Đọc danh sách nhạc từ Redis
 def load_playlist():
-    if not os.path.exists(json_file):
-        return []  # Trả về danh sách rỗng nếu file không tồn tại
-    with open(json_file, "r", encoding="utf-8") as file:
-        return json.load(file)
+    playlist_json = r.get("music_playlist")
+    return json.loads(playlist_json) if playlist_json else []
 
-# Cập nhật danh sách nhạc sau khi xóa bài đã phát
+# Cập nhật danh sách nhạc
 def update_playlist(new_data):
-    with open(json_file, "w", encoding="utf-8") as file:
-        json.dump(new_data, file, indent=4, ensure_ascii=False)
+    r.set("music_playlist", json.dumps(new_data, ensure_ascii=False))
 
 # Lấy thời lượng video YouTube
 def get_video_duration(video_url):
@@ -27,7 +26,7 @@ def get_video_duration(video_url):
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_url, download=False)
-        return info.get('duration', 0)  # Thời lượng video tính bằng giây
+        return info.get('duration', 0)
 
 # Chạy nhạc từ danh sách
 def play_music():
@@ -38,19 +37,18 @@ def play_music():
             print("🎶 Không còn bài hát nào, thoát chương trình!")
             break
 
-        # Lấy bài hát đầu tiên trong danh sách
         song = playlist[0]
         link = song["link"]
         title = song.get("title", "Video không có tiêu đề")
 
         print(f"🎵 Đang mở: {title} ({link})")
-        webbrowser.open(link)  # Mở link trong trình duyệt
+        webbrowser.open(link)
 
-        duration = get_video_duration(link) - 5  # Lấy thời lượng video
+        duration = get_video_duration(link) - 5
         print(f"⏳ Đợi {duration} giây để chuyển bài tiếp theo...")
-        time.sleep(duration)  # Chờ đúng thời gian video phát xong
+        time.sleep(duration)
 
-        # Xóa bài hát vừa phát khỏi danh sách và cập nhật JSON
+        # Xóa bài hát đã phát
         playlist.pop(0)
         update_playlist(playlist)
 
